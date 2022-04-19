@@ -4,19 +4,21 @@ parameters, as they make instantiating a lot easier, however, these classes tend
 boilerplate code that they usually require. In order not to be forced to do boilerplate code for each builder class, auto-builder offers to generate 
 such classes with just one annotation:
 ```java
-@AutoBuilder
-Person(
-        String firstName,
-        String lastName,
-        int age,
-        float height,
-        String address
-) {
-  this.firstName = firstName;
-  this.lastName = lastName;
-  this.age = age;
-  this.height = height;
-  this.address = address;
+public class Person {
+  @AutoBuilder
+  Person(
+          String firstName,
+          String lastName,
+          int age,
+          float height,
+          String address
+  ) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.age = age;
+    this.height = height;
+    this.address = address;
+  }
 }
 ```
 Now with the `@AutoBuilder` annotation in the constructor, you will be able to use a class named `PersonBuilder` with setter methods generated for each constructor
