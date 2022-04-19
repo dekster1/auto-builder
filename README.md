@@ -29,5 +29,18 @@ PersonBuilder builder = new PersonBuilder()
         .setLastName("Schopenhauer")
         .setAge(26)
         .setHeight(1.75)
-        .setAddress("Some address");
+        .setAddress("Some address")
+        .build();
+```
+If you don't like the class name or the build method name, you can change them freely using the annotation options:
+```java
+public class Person {
+  @AutoBuilder(className = "PersonCreator", methodName = "createPerson")
+  Person(
+          String firstName,
+          String lastName,
+          int age,
+          float height,
+          String address
+  ) {}
 ```
