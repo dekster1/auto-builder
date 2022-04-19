@@ -37,18 +37,18 @@ If you don't like the class name or the build method name, you can change them f
 public class Person {
   @AutoBuilder(className = "PersonCreator", methodName = "create")
   Person(
-          @BuilderParameter(methodName = "withFirstName") String firstName, // change the name of the setter method
-          String lastName,
+          @BuilderParameter(methodName = "withFirstName") String firstName,
+          @BuilderParameter(methodName = "withLastName") String lastName,
           int age,
           float height,
           String address
   ) {}
 ```
-
+And then, the object creation would look like this:
 ```java
 Person person = new PersonCreator()
         .withFirstName("Daniel")
-        .setLastName("Schopenhauer")
+        .withLastName("Schopenhauer")
         .setAge(26)
         .setHeight(1.75)
         .setAddress("Some address")
