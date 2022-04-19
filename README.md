@@ -19,3 +19,13 @@ Person(
   this.address = address;
 }
 ```
+Now with the `@AutoBuilder` annotation in the constructor, you will be able to use a class named `PersonBuilder` with setter methods generated for each constructor
+parameter:
+```java
+PersonBuilder builder = new PersonBuilder()
+        .setFirstName("Daniel")
+        .setLastName("Schopenhauer")
+        .setAge(26)
+        .setHeight(1.75)
+        .setAddress("Some address");
+```
