@@ -32,15 +32,26 @@ PersonBuilder builder = new PersonBuilder()
         .setAddress("Some address")
         .build();
 ```
-If you don't like the class name or the build method name, you can change them freely using the annotation options:
+If you don't like the class name or the build method name, you can change them freely using the annotation options. Also, the annotation `@BuilderParameter` allows to change the name of the generated setter method for the parameter. Applying this, we would have:
 ```java
 public class Person {
-  @AutoBuilder(className = "PersonCreator", methodName = "createPerson")
+  @AutoBuilder(className = "PersonCreator", methodName = "create")
   Person(
-          String firstName,
+          @BuilderParameter(methodName = "withFirstName") String firstName, // change the name of the setter method
           String lastName,
           int age,
           float height,
           String address
   ) {}
 ```
+
+```java
+PersonCreator builder = new PersonCreator()
+        .withFirstName("Daniel")
+        .setLastName("Schopenhauer")
+        .setAge(26)
+        .setHeight(1.75)
+        .setAddress("Some address")
+        .create();
+```
+        
