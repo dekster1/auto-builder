@@ -12,8 +12,6 @@ public class Person {
   float height;
   String address;
 
-  Person() {}
-
   @AutoBuilder
   Person(
           String firstName,

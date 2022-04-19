@@ -2,9 +2,7 @@ package io.github.tosabi.autobuilder.code;
 
 import io.github.tosabi.autobuilder.Parameter;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public final class ClassWriter {
 
@@ -58,11 +56,12 @@ public final class ClassWriter {
   }
 
 
-  public void addPrivateConstructor() {
+  public void addPublicConstructor() {
     builder.append(LINE_BREAK)
-            .append("  private ")
+            .append("  public ")
             .append(className)
-            .append("() {}");
+            .append("() {}")
+            .append(LINE_BREAK);
   }
 
   public void addMethod(MethodWriter method) {
@@ -83,7 +82,23 @@ public final class ClassWriter {
     addMethod(new MethodWriter()
             .defineSignature("  public", false, className)
             .name(parameter.getMethodName(), parameter.getType(), parameter.getIdentifier())
-            .defineBody(" this." + name + " = " + name + ";"));
+            .defineBody(" this." + name + " = " + name + ";", true));
+  }
+
+  public void createBuildMethod(String type, String methodName, List<Parameter> parameters) {
+    StringBuilder params = new StringBuilder();
+    int index = 0;
+    for (Parameter parameter : parameters) {
+      params.append(parameter.getIdentifier());
+      if (++index < parameters.size()) {
+        params.append(", ");
+      }
+    }
+
+    addMethod(new MethodWriter()
+            .defineSignature("  public", false, type)
+            .name(methodName)
+            .defineBody(" return new " + type + "(" + params + ");", false));
   }
 
   public String write() {

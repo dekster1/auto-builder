@@ -28,6 +28,12 @@ final class MethodWriter {
     return this;
   }
 
+  public MethodWriter name(String name) {
+    builder.append(name)
+            .append("(");
+    return this;
+  }
+
   public MethodWriter addParam(String type, String identifier) {
     if (!firstParam) {
       builder.append(", ");
@@ -41,19 +47,25 @@ final class MethodWriter {
     return this;
   }
 
-  public MethodWriter defineBody(String body) {
+  public MethodWriter defineBody(String body, boolean setter) {
     if (forInterface) {
       throw new IllegalArgumentException("Interface cannot define a body");
     }
     builder.append(") {")
             .append(ClassWriter.LINE_BREAK)
             .append("   ")
-            .append(body)
-            .append(ClassWriter.LINE_BREAK)
-            .append("    return this;")
-            .append(ClassWriter.LINE_BREAK)
-            .append("  }")
-            .append(ClassWriter.LINE_BREAK);
+            .append(body);
+    if (setter) {
+      builder.append(ClassWriter.LINE_BREAK)
+              .append("    return this;")
+              .append(ClassWriter.LINE_BREAK)
+              .append("  }")
+              .append(ClassWriter.LINE_BREAK);
+    } else {
+      builder.append(ClassWriter.LINE_BREAK)
+              .append("  }")
+              .append(ClassWriter.LINE_BREAK);
+    }
     return this;
   }
 

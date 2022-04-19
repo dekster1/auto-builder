@@ -3,6 +3,7 @@ package io.github.tosabi.autobuilder;
 import io.github.tosabi.autobuilder.code.ClassWriter;
 
 import javax.lang.model.element.Element;
+import java.util.ArrayList;
 
 public class BuilderGenerator {
 
@@ -30,11 +31,17 @@ public class BuilderGenerator {
     classWriter.defineClass("public class", className);
     classWriter.addFields(elementParameters.getParameters());
 
-    classWriter.addPrivateConstructor();
+    classWriter.addPublicConstructor();
 
     for (Parameter parameter : elementParameters.getParameters()) {
       classWriter.createSetter(parameter, className);
     }
+
+    classWriter.createBuildMethod(
+            element.getEnclosingElement().getSimpleName().toString(),
+            constructor.getMethodName(),
+            new ArrayList<>(elementParameters.getParameters())
+    );
 
     return classWriter.write();
   }
