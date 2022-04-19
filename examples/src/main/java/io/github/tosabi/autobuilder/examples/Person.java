@@ -12,7 +12,7 @@ public class Person {
   String address;
 
   @AutoBuilder
-  public Person(
+  Person(
           @BuilderParameter(methodName = "withName") String firstName,
           String lastName,
           int age,

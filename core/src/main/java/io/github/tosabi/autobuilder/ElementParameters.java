@@ -1,23 +1,20 @@
-package io.github.tosabi.autobuilder.code;
-
-import io.github.tosabi.autobuilder.BuilderParameter;
-import io.github.tosabi.autobuilder.Parameter;
+package io.github.tosabi.autobuilder;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class FieldParser {
+public class ElementParameters {
 
-  private final Set<Parameter> fields;
+  private final Set<Parameter> parameters;
 
-  private FieldParser(Set<Parameter> fields) {
-    this.fields = fields;
+  private ElementParameters(Set<Parameter> parameters) {
+    this.parameters = parameters;
   }
 
   public Set<Parameter> getFields() {
-    return fields;
+    return parameters;
   }
 
   /**
@@ -27,24 +24,20 @@ public class FieldParser {
    * @param element The executable element to parse
    * @return a new {@code FieldParser} instance with all the parsed fields
    */
-  public static FieldParser of(ExecutableElement element) {
-    Set<Parameter> fields = new LinkedHashSet<>();
+  public static ElementParameters of(ExecutableElement element) {
+    Set<Parameter> parameters = new LinkedHashSet<>();
 
     for (VariableElement variableElement : element.getParameters()) {
       String identifier = variableElement.getSimpleName().toString();
       StringBuilder builder = new StringBuilder(identifier.substring(1));
       char first = identifier.toLowerCase().charAt(0);
 
-      Parameter parameter = new Parameter(
+      parameters.add(new Parameter(
               variableElement.asType().toString(),
               builder.insert(0, first).toString(),
               variableElement.getAnnotation(BuilderParameter.class)
-      );
-
-      if (!parameter.isIgnored()) {
-        fields.add(parameter);
-      }
+      ));
     }
-    return new FieldParser(fields);
+    return new ElementParameters(parameters);
   }
 }

@@ -5,7 +5,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeParameterElement;
 import java.util.List;
 
-public final class AnnotatedConstructor {
+final class AnnotatedConstructor {
 
   private final Element element;
   private final ExecutableElement constructor;

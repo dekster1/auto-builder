@@ -22,10 +22,6 @@ public class Parameter {
     return identifier;
   }
 
-  public boolean isIgnored() {
-    return annotation != null && annotation.ignore();
-  }
-
   public String getMethodName() {
     String name = annotation != null ? annotation.methodName() : "";
 

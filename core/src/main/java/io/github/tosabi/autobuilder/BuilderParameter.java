@@ -18,11 +18,4 @@ public @interface BuilderParameter {
    * @return the method name
    */
   String methodName() default "";
-
-  /**
-   * Specifies if the parameter should be ignored in the builder class. If this is set to true, the
-   * builder class will not generate a field and a setter method for the parameter.
-   * @return
-   */
-  boolean ignore() default false;
 }

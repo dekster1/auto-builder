@@ -45,11 +45,11 @@ public class AutoBuilderProcessor extends AbstractProcessor {
         error(element, "Only constructors can be annotated with %s", AutoBuilder.class.getSimpleName());
         return true;
       }
+
       AnnotatedConstructor constructor = new AnnotatedConstructor(element);
+      BuilderGenerator generator = new BuilderGenerator(constructor);
 
       try {
-        BuilderGenerator generator = new BuilderGenerator(constructor);
-
         JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(generator.getClassName());
         BufferedWriter bufferedWriter = new BufferedWriter(sourceFile.openWriter());
         bufferedWriter.write(generator.generate());

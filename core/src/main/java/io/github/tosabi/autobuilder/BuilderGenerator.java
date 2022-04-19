@@ -1,7 +1,6 @@
 package io.github.tosabi.autobuilder;
 
 import io.github.tosabi.autobuilder.code.ClassWriter;
-import io.github.tosabi.autobuilder.code.FieldParser;
 
 import javax.lang.model.element.Element;
 
@@ -24,16 +23,16 @@ public class BuilderGenerator {
   public String generate() {
     Element element = constructor.getElement();
     String packageName = getPackageName(element);
-    FieldParser fieldParser = FieldParser.of(constructor.getConstructor());
+    ElementParameters elementParameters = ElementParameters.of(constructor.getConstructor());
 
     ClassWriter classWriter = new ClassWriter();
     classWriter.definePackage(packageName);
     classWriter.defineClass("public class", className);
-    classWriter.addFields(fieldParser.getFields());
+    classWriter.addFields(elementParameters.getFields());
 
     classWriter.addPrivateConstructor();
 
-    for (Parameter field : fieldParser.getFields()) {
+    for (Parameter field : elementParameters.getFields()) {
       classWriter.createSetter(field, className);
     }
 
