@@ -24,7 +24,7 @@ public class Person {
 Now with the `@AutoBuilder` annotation in the constructor, you will be able to use a class named `PersonBuilder` with setter methods generated for each constructor
 parameter:
 ```java
-PersonBuilder builder = new PersonBuilder()
+Person person = new PersonBuilder()
         .setFirstName("Daniel")
         .setLastName("Schopenhauer")
         .setAge(26)
@@ -46,7 +46,7 @@ public class Person {
 ```
 
 ```java
-PersonCreator builder = new PersonCreator()
+Person person = new PersonCreator()
         .withFirstName("Daniel")
         .setLastName("Schopenhauer")
         .setAge(26)
