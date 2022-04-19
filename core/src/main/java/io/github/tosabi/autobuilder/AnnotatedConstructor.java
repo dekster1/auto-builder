@@ -2,8 +2,6 @@ package io.github.tosabi.autobuilder;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeParameterElement;
-import java.util.List;
 
 final class AnnotatedConstructor {
 
@@ -27,19 +25,11 @@ final class AnnotatedConstructor {
     return constructor;
   }
 
-  public List<? extends TypeParameterElement> getTypeParameters() {
-    return constructor.getTypeParameters();
-  }
-
   public String getClassName() {
     return annotation.className();
   }
 
   public String getMethodName() {
-    String methodName = annotation.methodName();
-    if (methodName.isEmpty()) {
-      throw new IllegalArgumentException("Invalid method name");
-    }
-    return methodName;
+    return annotation.methodName().isEmpty() ? "build" : annotation.methodName();
   }
 }

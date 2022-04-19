@@ -28,12 +28,12 @@ public class BuilderGenerator {
     ClassWriter classWriter = new ClassWriter();
     classWriter.definePackage(packageName);
     classWriter.defineClass("public class", className);
-    classWriter.addFields(elementParameters.getFields());
+    classWriter.addFields(elementParameters.getParameters());
 
     classWriter.addPrivateConstructor();
 
-    for (Parameter field : elementParameters.getFields()) {
-      classWriter.createSetter(field, className);
+    for (Parameter parameter : elementParameters.getParameters()) {
+      classWriter.createSetter(parameter, className);
     }
 
     return classWriter.write();

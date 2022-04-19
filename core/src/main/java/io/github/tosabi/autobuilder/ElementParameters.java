@@ -13,7 +13,7 @@ public class ElementParameters {
     this.parameters = parameters;
   }
 
-  public Set<Parameter> getFields() {
+  public Set<Parameter> getParameters() {
     return parameters;
   }
 

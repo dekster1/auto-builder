@@ -25,6 +25,7 @@ public class Parameter {
   public String getMethodName() {
     String name = annotation != null ? annotation.methodName() : "";
 
+    // generate if empty
     return name.isEmpty() ? "set" +
             Character.toUpperCase(identifier.charAt(0)) +
             identifier.substring(1) : name;

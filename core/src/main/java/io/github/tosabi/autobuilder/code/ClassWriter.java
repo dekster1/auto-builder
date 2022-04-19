@@ -82,19 +82,8 @@ public final class ClassWriter {
 
     addMethod(new MethodWriter()
             .defineSignature("  public", false, className)
-            .name(parameter.getMethodName())
+            .name(parameter.getMethodName(), parameter.getType(), parameter.getIdentifier())
             .defineBody(" this." + name + " = " + name + ";"));
-  }
-
-  public ClassWriter createGetterForField(String name) {
-    if (!fields.containsKey(name)) {
-      throw new IllegalArgumentException("Field not found for Getter: " + name);
-    }
-    addMethod(new MethodWriter()
-            .defineSignature("public", false, fields.get(name))
-            .name("get" + Character.toUpperCase(name.charAt(0)) + name.substring(1))
-            .defineBody(" return this." + name + ";"));
-    return this;
   }
 
   public String write() {

@@ -19,9 +19,12 @@ final class MethodWriter {
     return this;
   }
 
-  public MethodWriter name(String name) {
+  public MethodWriter name(String name, String type, String identifier) {
     builder.append(name)
-            .append("(");
+            .append("(")
+            .append(type)
+            .append(" ")
+            .append(identifier);
     return this;
   }
 

@@ -40,23 +40,28 @@ public class AutoBuilderProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    for (Element element : roundEnv.getElementsAnnotatedWith(AutoBuilder.class)) {
-      if (element.getKind() != ElementKind.CONSTRUCTOR) {
-        error(element, "Only constructors can be annotated with %s", AutoBuilder.class.getSimpleName());
-        return true;
-      }
+    try {
+      for (Element element : roundEnv.getElementsAnnotatedWith(AutoBuilder.class)) {
+        if (element.getKind() != ElementKind.CONSTRUCTOR) {
+          error(element, "Only constructors can be annotated with %s", AutoBuilder.class.getSimpleName());
+          return true;
+        }
 
-      AnnotatedConstructor constructor = new AnnotatedConstructor(element);
-      BuilderGenerator generator = new BuilderGenerator(constructor);
+        AnnotatedConstructor constructor = new AnnotatedConstructor(element);
+        if (constructor.getConstructor().getParameters().size() < 1) {
+          throw new AutoBuilderException(element, "Couldn't create a builder for empty constructor %s", element);
+        }
 
-      try {
+        BuilderGenerator generator = new BuilderGenerator(constructor);
         JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(generator.getClassName());
         BufferedWriter bufferedWriter = new BufferedWriter(sourceFile.openWriter());
         bufferedWriter.write(generator.generate());
         bufferedWriter.close();
-      } catch (IOException e) {
-        error(element, e.toString());
       }
+    } catch (IOException e) {
+      error(null, e.toString());
+    } catch (AutoBuilderException e) {
+      error(e.getElement(), e.toString());
     }
     return false;
   }

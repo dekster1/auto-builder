@@ -1,7 +1,8 @@
 package io.github.tosabi.autobuilder.examples;
 
 import io.github.tosabi.autobuilder.AutoBuilder;
-import io.github.tosabi.autobuilder.BuilderParameter;
+
+import java.util.List;
 
 public class Person {
 
@@ -11,13 +12,16 @@ public class Person {
   float height;
   String address;
 
+  Person() {}
+
   @AutoBuilder
   Person(
-          @BuilderParameter(methodName = "withName") String firstName,
+          String firstName,
           String lastName,
           int age,
           float height,
-          String address
+          String address,
+          List<String> jobs
   ) {
     this.firstName = firstName;
     this.lastName = lastName;
