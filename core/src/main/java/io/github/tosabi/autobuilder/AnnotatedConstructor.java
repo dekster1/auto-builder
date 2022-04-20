@@ -39,6 +39,6 @@ final class AnnotatedConstructor {
   }
 
   public String getMethodName() {
-    return annotation.methodName().isEmpty() ? "build" : annotation.methodName();
+    return annotation.methodName();
   }
 }

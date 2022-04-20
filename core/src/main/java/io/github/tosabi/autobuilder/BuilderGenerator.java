@@ -6,32 +6,36 @@ import io.github.tosabi.autobuilder.util.Collect;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 public class BuilderGenerator {
 
   static final String SUFFIX = "Builder";
 
   private final AnnotatedConstructor constructor;
+
+  private final Element element;
   private final String className;
+  private final ElementParameters elementParameters;
 
   public BuilderGenerator(AnnotatedConstructor constructor) {
     this.constructor = constructor;
+    this.element = constructor.getElement();
     this.className = constructor.getElement().getEnclosingElement().getSimpleName() + SUFFIX;
+    this.elementParameters = ElementParameters.of(constructor.getConstructor());
   }
 
   public String getClassName() {
     return className;
   }
 
+  /** Generates all the builder class code */
   public String generate() {
-    Element element = constructor.getElement();
-    String packageName = getPackageName(element);
-    String elementClass = element.getEnclosingElement().getSimpleName().toString();
-
-    ElementParameters elementParameters = ElementParameters.of(constructor.getConstructor());
     Set<MethodSpec> methods = new LinkedHashSet<>();
+    String packageName = getPackageName(element);
 
     for (Parameter parameter : elementParameters.getParameters()) {
       methods.add(MethodSpec.methodBuilder()
@@ -47,20 +51,7 @@ public class BuilderGenerator {
       );
     }
 
-    List<String> parameterList = Collect.mapList(
-            new ArrayList<>(elementParameters.getParameters()),
-            Parameter::getIdentifier
-    );
-
-    methods.add(MethodSpec.methodBuilder()
-                    .addModifier(Modifier.PUBLIC)
-                    .name(constructor.getMethodName())
-                    .returns(elementClass)
-                    .addStatement("return new %s(%s);",
-                            elementClass,
-                            new Sequence(parameterList, ", ").unify()
-                    )
-                    .create());
+    methods.add(buildMethod());
 
     TypeSpec typeSpec = TypeSpec.newSpec()
             .packageName(packageName)
@@ -70,6 +61,28 @@ public class BuilderGenerator {
             .create();
 
     return new ClassWriter(packageName, typeSpec).write();
+  }
+
+
+  /** Generates the builder class "build()" method */
+  private MethodSpec buildMethod() {
+    String elementClass = element.getEnclosingElement().getSimpleName().toString();
+    String methodName = constructor.getMethodName();
+
+    List<String> parameterList = Collect.mapList(
+            new ArrayList<>(elementParameters.getParameters()),
+            Parameter::getIdentifier
+    );
+
+    return MethodSpec.methodBuilder()
+            .addModifier(Modifier.PUBLIC)
+            .name(methodName.isEmpty() ? "build" : methodName)
+            .returns(elementClass)
+            .addStatement("return new %s(%s);",
+                    elementClass,
+                    new Sequence(parameterList, ", ").unify()
+            )
+            .create();
   }
 
   private String getPackageName(Element element) {
