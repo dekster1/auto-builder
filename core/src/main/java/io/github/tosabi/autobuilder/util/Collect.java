@@ -21,4 +21,21 @@ public final class Collect {
     }
     return result;
   }
+
+  public static <T, V> Set<V> mapSet(Set<T> set, Function<T, V> function) {
+    Set<V> result = new LinkedHashSet<>();
+    for (T value : set) {
+      result.add(function.apply(value));
+    }
+    return result;
+  }
+
+  public static <T, V> Collection<V> mapCollection(Collection<T> collection,
+                                                   Collection<V> view,
+                                                   Function<T, V> function) {
+    for (T value : collection) {
+      view.add(function.apply(value));
+    }
+    return view;
+  }
 }

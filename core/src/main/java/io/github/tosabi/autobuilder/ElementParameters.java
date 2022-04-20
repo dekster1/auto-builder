@@ -1,5 +1,7 @@
 package io.github.tosabi.autobuilder;
 
+import io.github.tosabi.autobuilder.util.Collect;
+
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.LinkedHashSet;

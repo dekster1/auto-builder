@@ -4,12 +4,12 @@ import io.github.tosabi.autobuilder.MethodSpec;
 import io.github.tosabi.autobuilder.Parameter;
 import io.github.tosabi.autobuilder.TypeSpec;
 
-public final class BetaClassWriter extends CodeWriter {
+public final class ClassWriter extends CodeWriter {
 
   private final TypeSpec spec;
   private final String className, packageName;
 
-  public BetaClassWriter(String packageName, TypeSpec spec) {
+  public ClassWriter(String packageName, TypeSpec spec) {
     this.packageName = packageName;
     this.spec = spec;
     this.className = spec.getClassName();
@@ -29,7 +29,7 @@ public final class BetaClassWriter extends CodeWriter {
     builder.append(NEW_LINE);
 
     for (MethodSpec method : spec.getMethods()) {
-      CodeWriter methodWriter = new BetaMethodWriter(method);
+      CodeWriter methodWriter = new MethodWriter(method);
       builder.append(methodWriter.write());
     }
 

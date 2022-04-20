@@ -8,11 +8,11 @@ import java.util.List;
 
 import static io.github.tosabi.autobuilder.util.Collect.mapList;
 
-final class BetaMethodWriter extends CodeWriter {
+final class MethodWriter extends CodeWriter {
 
   private final MethodSpec spec;
 
-  public BetaMethodWriter(MethodSpec spec) {
+  public MethodWriter(MethodSpec spec) {
     this.spec = spec;
   }
 
@@ -26,7 +26,6 @@ final class BetaMethodWriter extends CodeWriter {
     builder.append("  ");
     builder.append(new Sequence(modifiers, " ").unify());
     appendln(" ", spec.getReturnType(), " ");
-    // method parameters
     appendln(spec.getMethodName(), "(", new Sequence(parameters, ", ").unify(), ") {");
 
     for (String statement : spec.getStatements()) {

@@ -3,12 +3,12 @@ package io.github.tosabi.autobuilder.code;
 import java.util.ArrayList;
 import java.util.List;
 
-final class Sequence {
+public final class Sequence {
 
   private final List<String> arguments;
-  private final String separator;
+  private String separator;
 
-  Sequence(List<String> arguments, String separator) {
+  public Sequence(List<String> arguments, String separator) {
     this.arguments = arguments;
     this.separator = separator;
   }
@@ -33,6 +33,18 @@ final class Sequence {
       }
     }
     return builder.toString();
+  }
+
+  public void setSeparator(String separator) {
+    this.separator = separator;
+  }
+
+  public String getSeparator() {
+    return separator;
+  }
+
+  public List<String> getArguments() {
+    return arguments;
   }
 
   @Override

@@ -1,11 +1,13 @@
 package io.github.tosabi.autobuilder;
 
-import io.github.tosabi.autobuilder.code.BetaClassWriter;
+import io.github.tosabi.autobuilder.code.ClassWriter;
+import io.github.tosabi.autobuilder.code.Sequence;
+import io.github.tosabi.autobuilder.util.Collect;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 
 public class BuilderGenerator {
 
@@ -26,6 +28,8 @@ public class BuilderGenerator {
   public String generate() {
     Element element = constructor.getElement();
     String packageName = getPackageName(element);
+    String elementClass = element.getEnclosingElement().getSimpleName().toString();
+
     ElementParameters elementParameters = ElementParameters.of(constructor.getConstructor());
     Set<MethodSpec> methods = new LinkedHashSet<>();
 
@@ -43,6 +47,21 @@ public class BuilderGenerator {
       );
     }
 
+    List<String> parameterList = Collect.mapList(
+            new ArrayList<>(elementParameters.getParameters()),
+            Parameter::getIdentifier
+    );
+
+    methods.add(MethodSpec.methodBuilder()
+                    .addModifier(Modifier.PUBLIC)
+                    .name(constructor.getMethodName())
+                    .returns(elementClass)
+                    .addStatement("return new %s(%s);",
+                            elementClass,
+                            new Sequence(parameterList, ", ").unify()
+                    )
+                    .create());
+
     TypeSpec typeSpec = TypeSpec.newSpec()
             .packageName(packageName)
             .className(className)
@@ -50,7 +69,7 @@ public class BuilderGenerator {
             .addMethods(methods)
             .create();
 
-    return new BetaClassWriter(packageName, typeSpec).write();
+    return new ClassWriter(packageName, typeSpec).write();
   }
 
   private String getPackageName(Element element) {
