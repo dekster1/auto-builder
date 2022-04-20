@@ -18,4 +18,6 @@ public @interface BuilderParameter {
    * @return the method name
    */
   String methodName() default "";
+
+  boolean nullable() default true;
 }

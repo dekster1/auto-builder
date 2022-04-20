@@ -13,16 +13,17 @@ public class ElementParameters {
     this.parameters = parameters;
   }
 
+  /** @return A {@link Set} with all the stored parameters */
   public Set<Parameter> getParameters() {
     return parameters;
   }
 
   /**
-   * Converts the type parameters of an {@link ExecutableElement} into fields
-   * and saves them in a new {@code FieldParser} instance.
+   * Converts all the parameters of an {@link ExecutableElement} into
+   * {@link Parameter} instances and saves them in a new {@code ElementParameters}.
    *
    * @param element The executable element to parse
-   * @return a new {@code FieldParser} instance with all the parsed fields
+   * @return a new {@code ElementParameters} instance with all the parameters
    */
   public static ElementParameters of(ExecutableElement element) {
     Set<Parameter> parameters = new LinkedHashSet<>();

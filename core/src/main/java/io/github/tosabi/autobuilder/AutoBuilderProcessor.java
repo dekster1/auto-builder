@@ -50,6 +50,10 @@ public class AutoBuilderProcessor extends AbstractProcessor {
         AnnotatedConstructor constructor = new AnnotatedConstructor(element);
         if (constructor.getConstructor().getParameters().size() < 1) {
           throw new AutoBuilderException(element, "Couldn't create a builder for empty constructor %s", element);
+        } else if (constructor.hasPrivateAccess()) {
+          throw new AutoBuilderException(element, "Constructor %s has private access in %s",
+                  element,
+                  element.getEnclosingElement().asType().toString());
         }
 
         BuilderGenerator generator = new BuilderGenerator(constructor);

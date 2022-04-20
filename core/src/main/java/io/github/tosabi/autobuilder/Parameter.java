@@ -14,14 +14,23 @@ public class Parameter {
     this.annotation = annotation;
   }
 
+  /** @return The parameter class type, e.g: org.example.Class */
   public String getType() {
     return type;
   }
 
+  /** The parameter name, this name will be used to name fields and methods */
   public String getIdentifier() {
     return identifier;
   }
 
+  /**
+   * Gets the parameter method name. If the parameter is not annotated with
+   * {@link BuilderParameter} a name will be auto generated. Same case if the
+   * parameter is annotated but the specified name is empty.
+   *
+   * @return the parameter method name
+   */
   public String getMethodName() {
     String name = annotation != null ? annotation.methodName() : "";
 
@@ -31,6 +40,12 @@ public class Parameter {
             identifier.substring(1) : name;
   }
 
+  /** @return {@code true} if the element can be nullable */
+  public boolean isNullable() {
+    return annotation != null && !annotation.nullable();
+  }
+
+  /** @return an {@link Optional} containing the annotation if present or either an empty one */
   public Optional<BuilderParameter> getAnnotation() {
     return Optional.ofNullable(annotation);
   }
@@ -55,6 +70,9 @@ public class Parameter {
 
   @Override
   public String toString() {
-    return "FieldInfo{type=" + type + ", identifier=" + identifier + "}";
+    return "Parameter{type=" + type +
+            ", identifier=" + identifier +
+            ", annotated=" + getAnnotation().isPresent() +
+            "}";
   }
 }
