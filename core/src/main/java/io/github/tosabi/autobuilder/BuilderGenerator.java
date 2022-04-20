@@ -1,6 +1,6 @@
 package io.github.tosabi.autobuilder;
 
-import io.github.tosabi.autobuilder.code.ClassWriter;
+import io.github.tosabi.autobuilder.code.CodeWriter;
 import io.github.tosabi.autobuilder.code.Sequence;
 import io.github.tosabi.autobuilder.util.Collect;
 
@@ -60,7 +60,7 @@ public class BuilderGenerator {
             .addMethod(buildMethod())
             .create();
 
-    return new ClassWriter(packageName, typeSpec).write();
+    return CodeWriter.classWriter(packageName, typeSpec).write();
   }
 
 
