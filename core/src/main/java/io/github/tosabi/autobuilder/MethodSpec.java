@@ -17,12 +17,12 @@ public class MethodSpec {
   private final Set<Parameter> parameters;
   private final Map<String, Indent> statements;
 
-  private MethodSpec(Specification specification) {
-    this.methodName = specification.methodName;
-    this.returnType = specification.returnType;
-    this.modifiers = specification.modifiers;
-    this.parameters = specification.parameters;
-    this.statements = specification.statements;
+  private MethodSpec(Builder builder) {
+    this.methodName = builder.methodName;
+    this.returnType = builder.returnType;
+    this.modifiers = builder.modifiers;
+    this.parameters = builder.parameters;
+    this.statements = builder.statements;
   }
 
   public String getMethodName() {
@@ -45,11 +45,11 @@ public class MethodSpec {
     return statements;
   }
 
-  public static Specification methodBuilder() {
-    return new Specification();
+  public static Builder methodBuilder() {
+    return new Builder();
   }
 
-  public static class Specification {
+  public static class Builder {
     private String methodName;
     private String returnType;
 
@@ -57,34 +57,34 @@ public class MethodSpec {
     private Set<Parameter> parameters = new LinkedHashSet<>();
     private final Map<String, Indent> statements = new LinkedHashMap<>();
 
-    private Specification() {}
+    private Builder() {}
 
-    public Specification name(String methodName) {
+    public Builder name(String methodName) {
       this.methodName = methodName;
       return this;
     }
 
-    public Specification addModifier(Modifier modifier) {
+    public Builder addModifier(Modifier modifier) {
       modifiers.add(modifier);
       return this;
     }
 
-    public Specification addParameter(Parameter parameter) {
+    public Builder addParameter(Parameter parameter) {
       parameters.add(parameter);
       return this;
     }
 
-    public Specification setParameters(Set<Parameter> parameters) {
+    public Builder setParameters(Set<Parameter> parameters) {
       this.parameters = parameters;
       return this;
     }
 
-    public Specification addStatement(String statement, Object... args) {
+    public Builder addStatement(String statement, Object... args) {
       statements.put(String.format(statement, args), Indent.BODY);
       return this;
     }
 
-    public Specification addFlowControl(String condition, String[] statements, Object... args) {
+    public Builder addFlowControl(String condition, String[] statements, Object... args) {
       this.statements.put(String.format(condition, args), Indent.BODY);
       for (String statement : statements) {
         this.statements.put(String.format(statement, args), Indent.FLOW);
@@ -92,7 +92,7 @@ public class MethodSpec {
       return this;
     }
 
-    public Specification returns(String returnType) {
+    public Builder returns(String returnType) {
       this.returnType = returnType;
       return this;
     }

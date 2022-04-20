@@ -47,7 +47,7 @@ public class AutoBuilderProcessor extends AbstractProcessor {
           return true;
         }
 
-        AnnotatedConstructor constructor = new AnnotatedConstructor(element);
+        AnnotatedConstructor constructor = new AnnotatedConstructor(element, processingEnv.getElementUtils());
         if (constructor.getConstructor().getParameters().size() < 1) {
           throw new AutoBuilderException(element, "Couldn't create a builder for empty constructor %s", element);
         } else if (constructor.hasPrivateAccess()) {

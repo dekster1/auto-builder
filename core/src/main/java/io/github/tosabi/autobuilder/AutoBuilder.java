@@ -13,5 +13,4 @@ public @interface AutoBuilder {
 
   String methodName() default "build";
 
-  boolean notNullParameters() default false;
 }

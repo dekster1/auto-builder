@@ -43,4 +43,9 @@ public class ElementParameters {
     }
     return new ElementParameters(parameters);
   }
+
+  @Override
+  public String toString() {
+    return parameters.toString();
+  }
 }

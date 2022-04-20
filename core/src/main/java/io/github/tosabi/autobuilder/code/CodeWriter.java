@@ -1,13 +1,12 @@
 package io.github.tosabi.autobuilder.code;
 
-import io.github.tosabi.autobuilder.MethodSpec;
-import io.github.tosabi.autobuilder.Parameter;
-import io.github.tosabi.autobuilder.TypeSpec;
+import io.github.tosabi.autobuilder.*;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.github.tosabi.autobuilder.util.Collect.mapList;
 
@@ -23,32 +22,39 @@ public abstract class CodeWriter {
   /** @return All the written builder class code */
   public abstract String write();
 
-  protected void append(boolean newLine, Object... args) {
+  protected void append(boolean newLine, String line, Object... args) {
     builder.append(NEW_LINE);
-    for (Object arg : args) {
-      if (arg instanceof Indent) {
-        Indent indent = (Indent) arg;
-        builder.append(indent.emit());
-      } else {
-        builder.append(arg);
+    for (int i = 0; i < args.length; i++) {
+      if (args[i] instanceof Indent) {
+        args[i] = ((Indent) args[i]).emit();
       }
     }
+    builder.append(String.format(line, args));
     if (newLine) builder.append(NEW_LINE);
   }
 
   /** Creates a new {code ClassWriter} instance with the given parameters */
-  public static CodeWriter classWriter(String packageName, TypeSpec spec) {
-    return new ClassWriter(packageName, spec);
+  public static CodeWriter classWriter(String packageName,
+                                       ClassName className,
+                                       ElementParameters parameters,
+                                       Set<MethodSpec> methods) {
+    return new ClassWriter(packageName, className, parameters, methods);
   }
 
   static final class ClassWriter extends CodeWriter {
-    private final TypeSpec spec;
-    private final String className, packageName;
+    private final String packageName;
+    private final ClassName className;
+    private final ElementParameters parameters;
+    private final Set<MethodSpec> methods;
 
-    public ClassWriter(String packageName, TypeSpec spec) {
+    public ClassWriter(String packageName,
+                       ClassName className,
+                       ElementParameters parameters,
+                       Set<MethodSpec> methods) {
       this.packageName = packageName;
-      this.spec = spec;
-      this.className = spec.getClassName();
+      this.className = className;
+      this.parameters = parameters;
+      this.methods = methods;
     }
 
     @Override
@@ -56,15 +62,16 @@ public abstract class CodeWriter {
       if (packageName != null) {
         builder.append("package ").append(packageName).append(";").append(NEW_LINE);
       }
-      append(true, "public class ", className, " {");
-      for (Parameter parameter : spec.getParameters().getParameters()) {
-        append(false, "  private ", parameter.getType(), " ", parameter.getIdentifier(), ";");
+
+      append(true, "public class %s {", className.getParameterizedName());
+      for (Parameter parameter : parameters.getParameters()) {
+        append(false, "  private %s %s;", parameter.getType(), parameter.getIdentifier());
       }
       builder.append(NEW_LINE);
-      append(true, "  public ", className, "() {}");
+      append(true, "  public %s() {}", className.getName());
       builder.append(NEW_LINE);
 
-      for (MethodSpec method : spec.getMethods()) {
+      for (MethodSpec method : methods) {
         CodeWriter methodWriter = new MethodWriter(method);
         builder.append(methodWriter.write());
       }
@@ -94,9 +101,9 @@ public abstract class CodeWriter {
 
       for (Map.Entry<String, Indent> entry : spec.getStatements().entrySet()) {
         if (entry.getValue() == Indent.BODY) {
-          append(false, Indent.BODY, entry.getKey());
+          append(false, "%s%s", Indent.BODY, entry.getKey());
         } else {
-          append(false, Indent.FLOW, entry.getKey());
+          append(false, "%s%s", Indent.FLOW, entry.getKey());
         }
       }
       append(true, "  }");

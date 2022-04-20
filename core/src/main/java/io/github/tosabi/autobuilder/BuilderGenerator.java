@@ -2,10 +2,11 @@ package io.github.tosabi.autobuilder;
 
 import io.github.tosabi.autobuilder.code.CodeWriter;
 import io.github.tosabi.autobuilder.code.Sequence;
-import io.github.tosabi.autobuilder.util.Collect;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -13,28 +14,27 @@ import java.util.Set;
 
 public class BuilderGenerator {
 
-  static final String SUFFIX = "Builder";
-
   private final AnnotatedConstructor constructor;
 
   private final Element element;
-  private final String className;
+  private final ClassName className;
   private final ElementParameters elementParameters;
 
   public BuilderGenerator(AnnotatedConstructor constructor) {
     this.constructor = constructor;
     this.element = constructor.getElement();
     this.elementParameters = ElementParameters.of(constructor.getConstructor());
-
-    String name = constructor.getClassName();
-    this.className = name.isEmpty() ? element.getEnclosingElement().getSimpleName() + SUFFIX : name;
+    this.className = ClassName.of(constructor);
   }
 
+  /** @return The builder class simple name. */
   public String getClassName() {
-    return className;
+    return className.getName();
   }
 
-  /** Generates all the builder class code */
+  /**
+   * Generates all the builder class code.
+   */
   public String generate() {
     Set<MethodSpec> methods = new LinkedHashSet<>();
     String packageName = getPackageName(element);
@@ -44,7 +44,7 @@ public class BuilderGenerator {
       methods.add(MethodSpec.methodBuilder()
               .addModifier(Modifier.PUBLIC)
               .name(parameter.getMethodName())
-              .returns(className)
+              .returns(className.getParameterizedName())
               .addParameter(parameter)
               .addStatement("this.%s = %s;", identifier, identifier)
               .addStatement("return this;")
@@ -52,53 +52,45 @@ public class BuilderGenerator {
       );
     }
 
-    TypeSpec typeSpec = TypeSpec.newSpec()
-            .packageName(packageName)
-            .className(className)
-            .parameters(elementParameters)
-            .addMethods(methods)
-            .addMethod(buildMethod())
-            .create();
-
-    return CodeWriter.classWriter(packageName, typeSpec).write();
+    return CodeWriter.classWriter(packageName, className, elementParameters, methods).write();
   }
 
-
-  /** Generates the builder class "build()" method */
+  /**
+   * Generates the builder class "build()" method.
+   */
   private MethodSpec buildMethod() {
+    List<String> parameterList = new ArrayList<>();
     String elementClass = element.getEnclosingElement().getSimpleName().toString();
     String methodName = constructor.getMethodName();
 
-    List<String> parameterList = Collect.mapList(
-            new ArrayList<>(elementParameters.getParameters()),
-            Parameter::getIdentifier
-    );
-
-    MethodSpec.Specification methodSpec = MethodSpec.methodBuilder()
+    MethodSpec.Builder builder = MethodSpec.methodBuilder()
             .addModifier(Modifier.PUBLIC)
             .name(methodName.isEmpty() ? "build" : methodName)
             .returns(elementClass);
 
     for (Parameter parameter : elementParameters.getParameters()) {
       if (!parameter.isNullable()) {
-        methodSpec.addFlowControl("if (%s == null)",
+        builder.addFlowControl(
+                "if (%s == null)",
                 new String[]{"throw new NullPointerException(\"%s == null\");"},
                 parameter.getIdentifier()
         );
       }
+      parameterList.add(parameter.getIdentifier());
     }
 
-    return methodSpec
-            .addStatement("return new %s(%s);",
+    return builder.addStatement(
+                    "return new %s(%s);",
                     elementClass,
                     new Sequence(parameterList, ", ").unify()
-            ).create();
+    ).create();
   }
 
   private String getPackageName(Element element) {
     Element enclosing = element.getEnclosingElement();
-    String name = enclosing.getSimpleName().toString();
+    TypeElement type = constructor.getElementUtils().getTypeElement(enclosing.toString());
 
-    return enclosing.asType().toString().replace("." + name, "");
+    PackageElement packageElement = constructor.getElementUtils().getPackageOf(type);
+    return packageElement.isUnnamed() ? null : packageElement.getQualifiedName().toString();
   }
 }
