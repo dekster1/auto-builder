@@ -41,21 +41,11 @@ public class BuilderGenerator {
 
     for (Parameter parameter : elementParameters.getParameters()) {
       String identifier = parameter.getIdentifier();
-      MethodSpec.Specification methodSpec = MethodSpec.methodBuilder()
+      methods.add(MethodSpec.methodBuilder()
               .addModifier(Modifier.PUBLIC)
               .name(parameter.getMethodName())
               .returns(className)
-              .addParameter(parameter);
-
-      if (!parameter.isNullable()) {
-        methodSpec.addFlowStatement(
-                "if (this.%s == null)",
-                "throw new NullPointerException();",
-                identifier
-        );
-      }
-
-      methods.add(methodSpec
+              .addParameter(parameter)
               .addStatement("this.%s = %s;", identifier, identifier)
               .addStatement("return this;")
               .create()
@@ -84,10 +74,21 @@ public class BuilderGenerator {
             Parameter::getIdentifier
     );
 
-    return MethodSpec.methodBuilder()
+    MethodSpec.Specification methodSpec = MethodSpec.methodBuilder()
             .addModifier(Modifier.PUBLIC)
             .name(methodName.isEmpty() ? "build" : methodName)
-            .returns(elementClass)
+            .returns(elementClass);
+
+    for (Parameter parameter : elementParameters.getParameters()) {
+      if (!parameter.isNullable()) {
+        methodSpec.addFlowControl("if (%s == null)",
+                new String[]{"throw new NullPointerException(\"%s == null\");"},
+                parameter.getIdentifier()
+        );
+      }
+    }
+
+    return methodSpec
             .addStatement("return new %s(%s);",
                     elementClass,
                     new Sequence(parameterList, ", ").unify()
