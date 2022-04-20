@@ -24,7 +24,7 @@ public class Person {
 Now with the `@AutoBuilder` annotation in the constructor, you will be able to use a class named `PersonBuilder` with setter methods generated for each constructor
 parameter:
 ```java
-PersonBuilder builder = new PersonBuilder()
+Person person = new PersonBuilder()
         .setFirstName("Daniel")
         .setLastName("Schopenhauer")
         .setAge(26)
@@ -32,15 +32,26 @@ PersonBuilder builder = new PersonBuilder()
         .setAddress("Some address")
         .build();
 ```
-If you don't like the class name or the build method name, you can change them freely using the annotation options:
+If you don't like the class name or the build method name, you can change them freely using the annotation options. Also, the annotation `@BuilderParameter` allows to change the name of the generated setter method for the parameter. Applying this, we would have:
 ```java
 public class Person {
-  @AutoBuilder(className = "PersonCreator", methodName = "createPerson")
+  @AutoBuilder(className = "PersonCreator", methodName = "create")
   Person(
-          String firstName,
-          String lastName,
+          @BuilderParameter(methodName = "withFirstName") String firstName,
+          @BuilderParameter(methodName = "withLastName") String lastName,
           int age,
           float height,
           String address
   ) {}
 ```
+And then, the object creation would look like this:
+```java
+Person person = new PersonCreator()
+        .withFirstName("Daniel")
+        .withLastName("Schopenhauer")
+        .setAge(26)
+        .setHeight(1.75)
+        .setAddress("Some address")
+        .create();
+```
+        
