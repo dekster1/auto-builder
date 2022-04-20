@@ -1,10 +1,9 @@
 package io.github.tosabi.autobuilder;
 
-import io.github.tosabi.autobuilder.util.Collect;
-
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class ElementParameters {
@@ -28,6 +27,7 @@ public class ElementParameters {
    * @return a new {@code ElementParameters} instance with all the parameters
    */
   public static ElementParameters of(ExecutableElement element) {
+    Objects.requireNonNull(element, "element");
     Set<Parameter> parameters = new LinkedHashSet<>();
 
     for (VariableElement variableElement : element.getParameters()) {

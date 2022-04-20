@@ -24,8 +24,10 @@ public class BuilderGenerator {
   public BuilderGenerator(AnnotatedConstructor constructor) {
     this.constructor = constructor;
     this.element = constructor.getElement();
-    this.className = constructor.getElement().getEnclosingElement().getSimpleName() + SUFFIX;
     this.elementParameters = ElementParameters.of(constructor.getConstructor());
+
+    String name = constructor.getClassName();
+    this.className = name.isEmpty() ? element.getEnclosingElement().getSimpleName() + SUFFIX : name;
   }
 
   public String getClassName() {
@@ -38,26 +40,24 @@ public class BuilderGenerator {
     String packageName = getPackageName(element);
 
     for (Parameter parameter : elementParameters.getParameters()) {
+      String identifier = parameter.getIdentifier();
       methods.add(MethodSpec.methodBuilder()
               .addModifier(Modifier.PUBLIC)
               .name(parameter.getMethodName())
               .returns(className)
               .addParameter(parameter)
-              .addStatement("this.%s = %s;",
-                      parameter.getIdentifier(), parameter.getIdentifier()
-              )
+              .addStatement("this.%s = %s;", identifier, identifier)
               .addStatement("return this;")
               .create()
       );
     }
-
-    methods.add(buildMethod());
 
     TypeSpec typeSpec = TypeSpec.newSpec()
             .packageName(packageName)
             .className(className)
             .parameters(elementParameters)
             .addMethods(methods)
+            .addMethod(buildMethod())
             .create();
 
     return new ClassWriter(packageName, typeSpec).write();
@@ -81,8 +81,7 @@ public class BuilderGenerator {
             .addStatement("return new %s(%s);",
                     elementClass,
                     new Sequence(parameterList, ", ").unify()
-            )
-            .create();
+            ).create();
   }
 
   private String getPackageName(Element element) {
