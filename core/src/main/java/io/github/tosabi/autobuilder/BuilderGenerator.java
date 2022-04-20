@@ -41,11 +41,21 @@ public class BuilderGenerator {
 
     for (Parameter parameter : elementParameters.getParameters()) {
       String identifier = parameter.getIdentifier();
-      methods.add(MethodSpec.methodBuilder()
+      MethodSpec.Specification methodSpec = MethodSpec.methodBuilder()
               .addModifier(Modifier.PUBLIC)
               .name(parameter.getMethodName())
               .returns(className)
-              .addParameter(parameter)
+              .addParameter(parameter);
+
+      if (!parameter.isNullable()) {
+        methodSpec.addFlowStatement(
+                "if (this.%s == null)",
+                "throw new NullPointerException();",
+                identifier
+        );
+      }
+
+      methods.add(methodSpec
               .addStatement("this.%s = %s;", identifier, identifier)
               .addStatement("return this;")
               .create()

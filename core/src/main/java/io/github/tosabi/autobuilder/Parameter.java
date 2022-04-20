@@ -42,12 +42,19 @@ public class Parameter {
 
   /** @return {@code true} if the element can be nullable */
   public boolean isNullable() {
-    return annotation != null && !annotation.nullable();
+    return isPrimitive() || annotation == null || annotation.nullable();
   }
 
   /** @return an {@link Optional} containing the annotation if present or either an empty one */
   public Optional<BuilderParameter> getAnnotation() {
     return Optional.ofNullable(annotation);
+  }
+
+  private boolean isPrimitive() {
+    return type.equals("double") || type.equals("float") ||
+            type.equals("boolean") || type.equals("byte") ||
+            type.equals("int") || type.equals("char") ||
+            type.equals("long") || type.equals("short");
   }
 
   @Override

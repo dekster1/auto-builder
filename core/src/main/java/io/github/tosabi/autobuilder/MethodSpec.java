@@ -1,7 +1,11 @@
 package io.github.tosabi.autobuilder;
 
+import io.github.tosabi.autobuilder.code.Indent;
+
 import javax.lang.model.element.Modifier;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class MethodSpec {
@@ -11,7 +15,7 @@ public class MethodSpec {
 
   private final Set<Modifier> modifiers;
   private final Set<Parameter> parameters;
-  private final Set<String> statements;
+  private final Map<String, Indent> statements;
 
   private MethodSpec(Specification specification) {
     this.methodName = specification.methodName;
@@ -37,7 +41,7 @@ public class MethodSpec {
     return parameters;
   }
 
-  public Set<String> getStatements() {
+  public Map<String, Indent> getStatements() {
     return statements;
   }
 
@@ -51,7 +55,7 @@ public class MethodSpec {
 
     private final Set<Modifier> modifiers = new LinkedHashSet<>();
     private Set<Parameter> parameters = new LinkedHashSet<>();
-    private final Set<String> statements = new LinkedHashSet<>();
+    private final Map<String, Indent> statements = new LinkedHashMap<>();
 
     private Specification() {}
 
@@ -76,7 +80,13 @@ public class MethodSpec {
     }
 
     public Specification addStatement(String statement, Object... args) {
-      statements.add(String.format(statement, args));
+      statements.put(String.format(statement, args), Indent.BODY);
+      return this;
+    }
+
+    public Specification addFlowStatement(String control, String statement, Object... args) {
+      statements.put(String.format(control, args), Indent.BODY);
+      statements.put(statement, Indent.FLOW);
       return this;
     }
 

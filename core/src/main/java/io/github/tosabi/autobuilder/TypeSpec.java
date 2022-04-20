@@ -1,6 +1,5 @@
 package io.github.tosabi.autobuilder;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

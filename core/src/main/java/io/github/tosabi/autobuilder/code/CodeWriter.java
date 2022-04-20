@@ -7,6 +7,7 @@ import io.github.tosabi.autobuilder.TypeSpec;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static io.github.tosabi.autobuilder.util.Collect.mapList;
 
@@ -16,30 +17,31 @@ public abstract class CodeWriter {
 
   protected final StringBuilder builder = new StringBuilder();
 
+  /** Inherited only */
   protected CodeWriter() {}
 
+  /** @return All the written builder class code */
   public abstract String write();
 
   protected void append(boolean newLine, Object... args) {
     builder.append(NEW_LINE);
     for (Object arg : args) {
-      builder.append(arg);
+      if (arg instanceof Indent) {
+        Indent indent = (Indent) arg;
+        builder.append(indent.emit());
+      } else {
+        builder.append(arg);
+      }
     }
     if (newLine) builder.append(NEW_LINE);
   }
 
-  protected void appendIn(Object... args) {
-    for (Object arg : args) {
-      builder.append(arg);
-    }
-  }
-
+  /** Creates a new {code ClassWriter} instance with the given parameters */
   public static CodeWriter classWriter(String packageName, TypeSpec spec) {
     return new ClassWriter(packageName, spec);
   }
 
   static final class ClassWriter extends CodeWriter {
-
     private final TypeSpec spec;
     private final String className, packageName;
 
@@ -72,7 +74,6 @@ public abstract class CodeWriter {
   }
 
   static final class MethodWriter extends CodeWriter {
-
     private final MethodSpec spec;
 
     public MethodWriter(MethodSpec spec) {
@@ -91,11 +92,21 @@ public abstract class CodeWriter {
       appendIn(" ", spec.getReturnType(), " ");
       appendIn(spec.getMethodName(), "(", new Sequence(parameters, ", ").unify(), ") {");
 
-      for (String statement : spec.getStatements()) {
-        append(false, "    ", statement);
+      for (Map.Entry<String, Indent> entry : spec.getStatements().entrySet()) {
+        if (entry.getValue() == Indent.BODY) {
+          append(false, Indent.BODY, entry.getKey());
+        } else {
+          append(false, Indent.FLOW, entry.getKey());
+        }
       }
       append(true, "  }");
       return builder.toString();
+    }
+
+    private void appendIn(Object... args) {
+      for (Object arg : args) {
+        builder.append(arg);
+      }
     }
   }
 }
