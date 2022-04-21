@@ -63,7 +63,7 @@ public abstract class CodeWriter {
         builder.append("package ").append(packageName).append(";").append(NEW_LINE);
       }
 
-      append(true, "public class %s {", className.getParameterizedName());
+      append(true, "public class %s {", className.getFullName());
       for (Parameter parameter : parameters.getParameters()) {
         append(false, "  private %s %s;", parameter.getType(), parameter.getIdentifier());
       }
@@ -100,10 +100,15 @@ public abstract class CodeWriter {
       appendIn(spec.getMethodName(), "(", new Sequence(parameters, ", ").unify(), ") {");
 
       for (Map.Entry<String, Indent> entry : spec.getStatements().entrySet()) {
-        if (entry.getValue() == Indent.BODY) {
-          append(false, "%s%s", Indent.BODY, entry.getKey());
-        } else {
-          append(false, "%s%s", Indent.FLOW, entry.getKey());
+        append(false, "%s%s", entry.getValue(), entry.getKey());
+        switch (entry.getValue()) {
+          case EXPRESSION:
+            appendIn(" {");
+            break;
+          case STATEMENT:
+            append(false, "%s}", Indent.EXPRESSION);
+            break;
+          default: break;
         }
       }
       append(true, "  }");

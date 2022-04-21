@@ -19,5 +19,10 @@ public @interface BuilderParameter {
    */
   String methodName() default "";
 
+  /**
+   * Specifies whether the parameter can be null. If this option is set to false, a null check for
+   * this parameter be auto generated in the build method.
+   * @return {@code true} if nullable
+   */
   boolean nullable() default true;
 }

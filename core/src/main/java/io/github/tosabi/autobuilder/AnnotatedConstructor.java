@@ -34,10 +34,6 @@ final class AnnotatedConstructor {
     return constructor;
   }
 
-  public TypeElement getTypeElement() {
-    return (TypeElement) element.getEnclosingElement();
-  }
-
   public Set<Modifier> getModifiers() {
     return element.getModifiers();
   }

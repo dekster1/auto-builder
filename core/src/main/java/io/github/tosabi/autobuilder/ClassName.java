@@ -41,18 +41,22 @@ public final class ClassName {
    * @return The full parameterized name of the builder class. If the class is not parameterized
    * then {@link #getName()} will be returned.
    */
-  public String getParameterizedName() {
-    if (isParameterized()) {
-      StringBuilder builder = new StringBuilder();
-      TypeElement element = getTypeElement();
+  public String getFullName() {
+    return isParameterized() ? getName() + getTypeParameters() : getName();
+  }
 
-      List<String> parameters = Collect.mapList(element.getTypeParameters(), TypeParameterElement::toString);
-      Sequence sequence = new Sequence(parameters, ", ");
-
-      builder.append(getName()).append(sequence.unify('<', '>'));
-      return builder.toString();
+  /** @return A string containing all the class type parameters or either an empty string. */
+  public String getTypeParameters() {
+    if (!isParameterized()) {
+      return "";
     }
-    return getName();
+    StringBuilder builder = new StringBuilder();
+    TypeElement element = getTypeElement();
+
+    List<String> parameters = Collect.mapList(element.getTypeParameters(), TypeParameterElement::toString);
+    Sequence sequence = new Sequence(parameters, ", ");
+
+    return builder.append(sequence.unify('<', '>')).toString();
   }
 
   /** @return {@code true} if the annotated constructor class is parameterized. */

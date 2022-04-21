@@ -44,13 +44,15 @@ public class BuilderGenerator {
       methods.add(MethodSpec.methodBuilder()
               .addModifier(Modifier.PUBLIC)
               .name(parameter.getMethodName())
-              .returns(className.getParameterizedName())
+              .returns(className.getFullName())
               .addParameter(parameter)
               .addStatement("this.%s = %s;", identifier, identifier)
               .addStatement("return this;")
               .create()
       );
     }
+
+    methods.add(buildMethod());
 
     return CodeWriter.classWriter(packageName, className, elementParameters, methods).write();
   }
@@ -60,13 +62,16 @@ public class BuilderGenerator {
    */
   private MethodSpec buildMethod() {
     List<String> parameterList = new ArrayList<>();
-    String elementClass = element.getEnclosingElement().getSimpleName().toString();
     String methodName = constructor.getMethodName();
+
+    String elementClass = element.getEnclosingElement().getSimpleName().toString();
+    String returnType = className.isParameterized() ?
+            elementClass + className.getTypeParameters() : elementClass;
 
     MethodSpec.Builder builder = MethodSpec.methodBuilder()
             .addModifier(Modifier.PUBLIC)
             .name(methodName.isEmpty() ? "build" : methodName)
-            .returns(elementClass);
+            .returns(returnType);
 
     for (Parameter parameter : elementParameters.getParameters()) {
       if (!parameter.isNullable()) {
@@ -81,7 +86,7 @@ public class BuilderGenerator {
 
     return builder.addStatement(
                     "return new %s(%s);",
-                    elementClass,
+                    className.isParameterized() ? elementClass + "<>" : elementClass,
                     new Sequence(parameterList, ", ").unify()
     ).create();
   }

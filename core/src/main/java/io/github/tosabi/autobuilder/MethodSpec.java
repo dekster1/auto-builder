@@ -85,9 +85,9 @@ public class MethodSpec {
     }
 
     public Builder addFlowControl(String condition, String[] statements, Object... args) {
-      this.statements.put(String.format(condition, args), Indent.BODY);
+      this.statements.put(String.format(condition, args), Indent.EXPRESSION);
       for (String statement : statements) {
-        this.statements.put(String.format(statement, args), Indent.FLOW);
+        this.statements.put(String.format(statement, args), Indent.STATEMENT);
       }
       return this;
     }

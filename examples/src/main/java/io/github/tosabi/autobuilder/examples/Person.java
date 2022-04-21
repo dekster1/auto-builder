@@ -17,7 +17,7 @@ public class Person {
   Person(
           @BuilderParameter(nullable = false) String firstName,
           @BuilderParameter(nullable = false) String lastName,
-          @BuilderParameter(nullable = false) int age,
+          @BuilderParameter(nullable = false) Integer age,
           float height,
           @BuilderParameter(nullable = false) String address,
           List<String> jobs

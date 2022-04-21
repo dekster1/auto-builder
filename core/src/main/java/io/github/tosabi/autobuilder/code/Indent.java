@@ -1,7 +1,7 @@
 package io.github.tosabi.autobuilder.code;
 
 public enum Indent {
-  BODY(4), FLOW(6);
+  BODY(4), EXPRESSION(4), STATEMENT(6);
 
   final int sp;
 
