@@ -25,8 +25,8 @@ public abstract class CodeWriter {
   protected void append(boolean newLine, String line, Object... args) {
     builder.append(NEW_LINE);
     for (int i = 0; i < args.length; i++) {
-      if (args[i] instanceof Indent) {
-        args[i] = ((Indent) args[i]).emit();
+      if (args[i] instanceof MethodIndent) {
+        args[i] = ((MethodIndent) args[i]).emit();
       }
     }
     builder.append(String.format(line, args));
@@ -99,15 +99,13 @@ public abstract class CodeWriter {
       appendIn(" ", spec.getReturnType(), " ");
       appendIn(spec.getMethodName(), "(", new Sequence(parameters, ", ").unify(), ") {");
 
-      for (Map.Entry<String, Indent> entry : spec.getStatements().entrySet()) {
+      for (Map.Entry<String, MethodIndent> entry : spec.getStatements().entrySet()) {
         append(false, "%s%s", entry.getValue(), entry.getKey());
         switch (entry.getValue()) {
           case EXPRESSION:
-            appendIn(" {");
-            break;
+            appendIn(" {"); break;
           case STATEMENT:
-            append(false, "%s}", Indent.EXPRESSION);
-            break;
+            append(false, "%s}", MethodIndent.EXPRESSION); break;
           default: break;
         }
       }

@@ -1,11 +1,11 @@
 package io.github.tosabi.autobuilder.code;
 
-public enum Indent {
+public enum MethodIndent {
   BODY(4), EXPRESSION(4), STATEMENT(6);
 
   final int sp;
 
-  Indent(int sp) {
+  MethodIndent(int sp) {
     this.sp = sp;
   }
 

@@ -1,6 +1,5 @@
 package io.github.tosabi.autobuilder;
 
-import io.github.tosabi.autobuilder.code.Sequence;
 import io.github.tosabi.autobuilder.util.Collect;
 
 import javax.lang.model.element.Element;
@@ -50,13 +49,12 @@ public final class ClassName {
     if (!isParameterized()) {
       return "";
     }
-    StringBuilder builder = new StringBuilder();
     TypeElement element = getTypeElement();
 
     List<String> parameters = Collect.mapList(element.getTypeParameters(), TypeParameterElement::toString);
     Sequence sequence = new Sequence(parameters, ", ");
 
-    return builder.append(sequence.unify('<', '>')).toString();
+    return sequence.unify('<', '>');
   }
 
   /** @return {@code true} if the annotated constructor class is parameterized. */

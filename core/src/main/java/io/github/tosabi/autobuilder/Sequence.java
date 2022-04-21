@@ -1,4 +1,4 @@
-package io.github.tosabi.autobuilder.code;
+package io.github.tosabi.autobuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +60,6 @@ public final class Sequence {
 
   @Override
   public String toString() {
-    return arguments.toString();
+    return "Sequence{" + unify() + "}";
   }
 }

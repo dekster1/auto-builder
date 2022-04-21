@@ -1,7 +1,6 @@
 package io.github.tosabi.autobuilder;
 
 import io.github.tosabi.autobuilder.code.CodeWriter;
-import io.github.tosabi.autobuilder.code.Sequence;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
