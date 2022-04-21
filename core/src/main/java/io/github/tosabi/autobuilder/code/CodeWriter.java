@@ -25,8 +25,8 @@ public abstract class CodeWriter {
   protected void append(boolean newLine, String line, Object... args) {
     builder.append(NEW_LINE);
     for (int i = 0; i < args.length; i++) {
-      if (args[i] instanceof MethodIndent) {
-        args[i] = ((MethodIndent) args[i]).emit();
+      if (args[i] instanceof MethodLine) {
+        args[i] = ((MethodLine) args[i]).emit();
       }
     }
     builder.append(String.format(line, args));
@@ -35,24 +35,24 @@ public abstract class CodeWriter {
 
   /** Creates a new {code ClassWriter} instance with the given parameters */
   public static CodeWriter classWriter(String packageName,
-                                       ClassName className,
+                                       TypeInfo typeInfo,
                                        ElementParameters parameters,
                                        Set<MethodSpec> methods) {
-    return new ClassWriter(packageName, className, parameters, methods);
+    return new ClassWriter(packageName, typeInfo, parameters, methods);
   }
 
   static final class ClassWriter extends CodeWriter {
     private final String packageName;
-    private final ClassName className;
+    private final TypeInfo typeInfo;
     private final ElementParameters parameters;
     private final Set<MethodSpec> methods;
 
     public ClassWriter(String packageName,
-                       ClassName className,
+                       TypeInfo typeInfo,
                        ElementParameters parameters,
                        Set<MethodSpec> methods) {
       this.packageName = packageName;
-      this.className = className;
+      this.typeInfo = typeInfo;
       this.parameters = parameters;
       this.methods = methods;
     }
@@ -63,12 +63,12 @@ public abstract class CodeWriter {
         builder.append("package ").append(packageName).append(";").append(NEW_LINE);
       }
 
-      append(true, "public class %s {", className.getFullName());
+      append(true, "public class %s {", typeInfo.getFullName());
       for (Parameter parameter : parameters.getParameters()) {
         append(false, "  private %s %s;", parameter.getType(), parameter.getIdentifier());
       }
       builder.append(NEW_LINE);
-      append(true, "  public %s() {}", className.getName());
+      append(true, "  public %s() {}", typeInfo.getName());
       builder.append(NEW_LINE);
 
       for (MethodSpec method : methods) {
@@ -99,14 +99,12 @@ public abstract class CodeWriter {
       appendIn(" ", spec.getReturnType(), " ");
       appendIn(spec.getMethodName(), "(", new Sequence(parameters, ", ").unify(), ") {");
 
-      for (Map.Entry<String, MethodIndent> entry : spec.getStatements().entrySet()) {
+      for (Map.Entry<String, MethodLine> entry : spec.getStatements().entrySet()) {
         append(false, "%s%s", entry.getValue(), entry.getKey());
-        switch (entry.getValue()) {
-          case EXPRESSION:
-            appendIn(" {"); break;
-          case STATEMENT:
-            append(false, "%s}", MethodIndent.EXPRESSION); break;
-          default: break;
+        char end = entry.getValue().end;
+        appendIn(end == '{' ? " " + end : end);
+        if (entry.getValue() == MethodLine.STATEMENT) {
+          append(false, "%s}", MethodLine.EXPRESSION);
         }
       }
       append(true, "  }");

@@ -14,7 +14,7 @@ public class Parameter {
     this.annotation = annotation;
   }
 
-  /** @return The parameter full-qualified class name. */
+  /** @return The parameter full-qualified type. */
   public String getType() {
     return type;
   }

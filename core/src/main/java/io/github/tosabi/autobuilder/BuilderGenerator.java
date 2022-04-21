@@ -16,19 +16,19 @@ public class BuilderGenerator {
   private final AnnotatedConstructor constructor;
 
   private final Element element;
-  private final ClassName className;
+  private final TypeInfo typeInfo;
   private final ElementParameters elementParameters;
 
   public BuilderGenerator(AnnotatedConstructor constructor) {
     this.constructor = constructor;
     this.element = constructor.getElement();
     this.elementParameters = ElementParameters.of(constructor.getConstructor());
-    this.className = ClassName.of(constructor);
+    this.typeInfo = TypeInfo.of(constructor);
   }
 
   /** @return The builder class simple name. */
   public String getClassName() {
-    return className.getName();
+    return typeInfo.getName();
   }
 
   /**
@@ -43,17 +43,17 @@ public class BuilderGenerator {
       methods.add(MethodSpec.methodBuilder()
               .addModifier(Modifier.PUBLIC)
               .name(parameter.getMethodName())
-              .returns(className.getFullName())
+              .returns(typeInfo.getFullName())
               .addParameter(parameter)
-              .addStatement("this.%s = %s;", identifier, identifier)
-              .addStatement("return this;")
+              .addStatement("this.%s = %s", identifier, identifier)
+              .addStatement("return this")
               .create()
       );
     }
 
     methods.add(buildMethod());
 
-    return CodeWriter.classWriter(packageName, className, elementParameters, methods).write();
+    return CodeWriter.classWriter(packageName, typeInfo, elementParameters, methods).write();
   }
 
   /**
@@ -64,8 +64,8 @@ public class BuilderGenerator {
     String methodName = constructor.getMethodName();
 
     String elementClass = element.getEnclosingElement().getSimpleName().toString();
-    String returnType = className.isParameterized() ?
-            elementClass + className.getTypeParameters() : elementClass;
+    String returnType = typeInfo.isParameterized() ?
+            elementClass + typeInfo.getTypeParameters() : elementClass;
 
     MethodSpec.Builder builder = MethodSpec.methodBuilder()
             .addModifier(Modifier.PUBLIC)
@@ -76,7 +76,7 @@ public class BuilderGenerator {
       if (!parameter.isNullable()) {
         builder.addFlowControl(
                 "if (%s == null)",
-                new String[]{"throw new NullPointerException(\"%s == null\");"},
+                new String[]{"throw new NullPointerException(\"%s == null\")"},
                 parameter.getIdentifier()
         );
       }
@@ -84,8 +84,8 @@ public class BuilderGenerator {
     }
 
     return builder.addStatement(
-                    "return new %s(%s);",
-                    className.isParameterized() ? elementClass + "<>" : elementClass,
+                    "return new %s(%s)",
+                    typeInfo.isParameterized() ? elementClass + "<>" : elementClass,
                     new Sequence(parameterList, ", ").unify()
     ).create();
   }

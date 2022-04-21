@@ -8,20 +8,20 @@ import javax.lang.model.element.TypeParameterElement;
 import java.util.List;
 import java.util.Objects;
 
-public final class ClassName {
+public final class TypeInfo {
 
   /** Default suffix for builder classes */
   static final String SUFFIX = "Builder";
 
   private final AnnotatedConstructor constructor;
 
-  private ClassName(AnnotatedConstructor constructor) {
+  private TypeInfo(AnnotatedConstructor constructor) {
     this.constructor = Objects.requireNonNull(constructor, "constructor");
   }
 
   /** @return A new {@code ClassName} instance. */
-  public static ClassName of(AnnotatedConstructor constructor) {
-    return new ClassName(constructor);
+  public static TypeInfo of(AnnotatedConstructor constructor) {
+    return new TypeInfo(constructor);
   }
 
   /**
@@ -50,7 +50,6 @@ public final class ClassName {
       return "";
     }
     TypeElement element = getTypeElement();
-
     List<String> parameters = Collect.mapList(element.getTypeParameters(), TypeParameterElement::toString);
     Sequence sequence = new Sequence(parameters, ", ");
 

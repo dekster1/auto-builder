@@ -1,6 +1,6 @@
 package io.github.tosabi.autobuilder;
 
-import io.github.tosabi.autobuilder.code.MethodIndent;
+import io.github.tosabi.autobuilder.code.MethodLine;
 
 import javax.lang.model.element.Modifier;
 import java.util.LinkedHashMap;
@@ -17,7 +17,7 @@ public class MethodSpec {
 
   private final Set<Modifier> modifiers;
   private final Set<Parameter> parameters;
-  private final Map<String, MethodIndent> statements;
+  private final Map<String, MethodLine> statements;
 
   private MethodSpec(Builder builder) {
     this.methodName = builder.methodName;
@@ -43,7 +43,7 @@ public class MethodSpec {
     return parameters;
   }
 
-  public Map<String, MethodIndent> getStatements() {
+  public Map<String, MethodLine> getStatements() {
     return statements;
   }
 
@@ -57,7 +57,7 @@ public class MethodSpec {
 
     private final Set<Modifier> modifiers = new LinkedHashSet<>();
     private final Set<Parameter> parameters = new LinkedHashSet<>();
-    private final Map<String, MethodIndent> statements = new LinkedHashMap<>();
+    private final Map<String, MethodLine> statements = new LinkedHashMap<>();
 
     private Builder() {}
 
@@ -80,14 +80,15 @@ public class MethodSpec {
     }
 
     public Builder addStatement(String statement, Object... args) {
-      statements.put(String.format(statement, args), MethodIndent.BODY);
+      requireNonNull(statement, "statement");
+      statements.put(String.format(statement, args), MethodLine.BODY);
       return this;
     }
 
     public Builder addFlowControl(String condition, String[] statements, Object... args) {
-      this.statements.put(String.format(condition, args), MethodIndent.EXPRESSION);
+      this.statements.put(String.format(requireNonNull(condition), args), MethodLine.EXPRESSION);
       for (String statement : statements) {
-        this.statements.put(String.format(statement, args), MethodIndent.STATEMENT);
+        this.statements.put(String.format(requireNonNull(statement), args), MethodLine.STATEMENT);
       }
       return this;
     }
