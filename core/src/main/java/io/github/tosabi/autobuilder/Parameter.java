@@ -1,11 +1,11 @@
 package io.github.tosabi.autobuilder;
 
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class Parameter {
 
   private final String type, identifier;
+
   private final BuilderParameter annotation;
 
   public Parameter(String type, String identifier, BuilderParameter annotation) {
@@ -35,7 +35,7 @@ public class Parameter {
     String name = annotation != null ? annotation.methodName() : "";
 
     // generate if empty
-    return name.isEmpty() ? "set" +
+    return name.isEmpty() ? getStyle().getPrefix() +
             Character.toUpperCase(identifier.charAt(0)) +
             identifier.substring(1) : name;
   }
@@ -45,9 +45,22 @@ public class Parameter {
     return isPrimitive() || annotation == null || annotation.nullable();
   }
 
+  public Style getStyle() {
+    return annotation == null ? Style.SETTER : annotation.style();
+  }
+
   /** @return an {@link Optional} containing the annotation if present or either an empty one. */
   public Optional<BuilderParameter> getAnnotation() {
     return Optional.ofNullable(annotation);
+  }
+
+  public List<String> getTypeParameters() {
+    if (!type.contains("<")) {
+      return Collections.emptyList();
+    }
+    String sp = type.split("<")[1].replace(">", "");
+
+    return new ArrayList<>(Arrays.asList(sp.split(", ")));
   }
 
   private boolean isPrimitive() {

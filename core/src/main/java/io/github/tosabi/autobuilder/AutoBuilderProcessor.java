@@ -7,6 +7,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.BufferedWriter;
@@ -17,12 +18,18 @@ import java.util.Set;
 @AutoService(Processor.class)
 public class AutoBuilderProcessor extends AbstractProcessor {
 
+  /** Shared element utils */
+  static Elements ELEMENTS;
+
   private Messager messager;
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
 
+    if (ELEMENTS == null) {
+      ELEMENTS = processingEnv.getElementUtils();
+    }
     messager = processingEnv.getMessager();
   }
 

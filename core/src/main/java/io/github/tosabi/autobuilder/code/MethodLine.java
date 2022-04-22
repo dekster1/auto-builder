@@ -11,7 +11,7 @@ public enum MethodLine {
     this.indent = indent;
   }
 
-  public String emit() {
+  public String indent() {
     StringBuilder builder = new StringBuilder(indent);
     for (int i = 0; i < indent; i++) {
       builder.append(" ");

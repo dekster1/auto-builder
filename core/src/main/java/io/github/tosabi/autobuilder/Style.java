@@ -2,9 +2,17 @@ package io.github.tosabi.autobuilder;
 
 public enum Style {
 
-  SETTER,
+  SETTER("set"),
 
-  COLLECTION,
+  COLLECTION("addTo");
 
-  ENTRY
+  private final String prefix;
+
+  Style(String prefix) {
+    this.prefix = prefix;
+  }
+
+  public String getPrefix() {
+    return prefix;
+  }
 }

@@ -2,6 +2,7 @@ package io.github.tosabi.autobuilder.examples;
 
 import io.github.tosabi.autobuilder.AutoBuilder;
 import io.github.tosabi.autobuilder.BuilderParameter;
+import io.github.tosabi.autobuilder.Style;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class Person {
           @BuilderParameter(nullable = false) Integer age,
           float height,
           @BuilderParameter(nullable = false) String address,
-          List<String> jobs
+          @BuilderParameter(style = Style.COLLECTION) List<String> jobs
   ) {
     this.firstName = firstName;
     this.lastName = lastName;

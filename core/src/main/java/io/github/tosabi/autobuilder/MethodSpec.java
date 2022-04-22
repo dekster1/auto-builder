@@ -16,7 +16,7 @@ public class MethodSpec {
   private final String returnType;
 
   private final Set<Modifier> modifiers;
-  private final Set<Parameter> parameters;
+  private final Map<String, String> parameters;
   private final Map<String, MethodLine> statements;
 
   private MethodSpec(Builder builder) {
@@ -39,7 +39,7 @@ public class MethodSpec {
     return modifiers;
   }
 
-  public Set<Parameter> getParameters() {
+  public Map<String, String> getParameters() {
     return parameters;
   }
 
@@ -56,7 +56,7 @@ public class MethodSpec {
     private String returnType;
 
     private final Set<Modifier> modifiers = new LinkedHashSet<>();
-    private final Set<Parameter> parameters = new LinkedHashSet<>();
+    private final Map<String, String> parameters = new LinkedHashMap<>();
     private final Map<String, MethodLine> statements = new LinkedHashMap<>();
 
     private Builder() {}
@@ -73,9 +73,8 @@ public class MethodSpec {
       return this;
     }
 
-    public Builder addParameter(Parameter parameter) {
-      requireNonNull(parameter, "parameter");
-      parameters.add(parameter);
+    public Builder addParameter(String type, String name) {
+      parameters.put(requireNonNull(type), requireNonNull(name));
       return this;
     }
 

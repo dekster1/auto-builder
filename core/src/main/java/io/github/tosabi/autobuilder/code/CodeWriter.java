@@ -20,17 +20,23 @@ public abstract class CodeWriter {
   protected CodeWriter() {}
 
   /** @return All the written builder class code */
-  public abstract String write();
+  public abstract String encode();
 
-  protected void append(boolean newLine, String line, Object... args) {
+  protected void write(boolean newLine, String line, Object... args) {
     builder.append(NEW_LINE);
     for (int i = 0; i < args.length; i++) {
       if (args[i] instanceof MethodLine) {
-        args[i] = ((MethodLine) args[i]).emit();
+        args[i] = ((MethodLine) args[i]).indent();
       }
     }
     builder.append(String.format(line, args));
     if (newLine) builder.append(NEW_LINE);
+  }
+
+  protected void writeIn(Object... args) {
+    for (Object arg : args) {
+      builder.append(arg);
+    }
   }
 
   /** Creates a new {code ClassWriter} instance with the given parameters */
@@ -58,22 +64,23 @@ public abstract class CodeWriter {
     }
 
     @Override
-    public String write() {
+    public String encode() {
       if (packageName != null) {
-        builder.append("package ").append(packageName).append(";").append(NEW_LINE);
+        writeIn("package ", packageName, ";");
+        builder.append(NEW_LINE);
       }
 
-      append(true, "public class %s {", typeInfo.getFullName());
+      write(true, "public class %s {", typeInfo.getFullName());
       for (Parameter parameter : parameters.getParameters()) {
-        append(false, "  private %s %s;", parameter.getType(), parameter.getIdentifier());
+        write(false, "  private %s %s;", parameter.getType(), parameter.getIdentifier());
       }
       builder.append(NEW_LINE);
-      append(true, "  public %s() {}", typeInfo.getName());
+      write(true, "  public %s() {}", typeInfo.getName());
       builder.append(NEW_LINE);
 
       for (MethodSpec method : methods) {
         CodeWriter methodWriter = new MethodWriter(method);
-        builder.append(methodWriter.write());
+        builder.append(methodWriter.encode());
       }
 
       return builder.append("}").toString();
@@ -88,33 +95,37 @@ public abstract class CodeWriter {
     }
 
     @Override
-    public String write() {
-      List<String> modifiers = mapList(new ArrayList<>(spec.getModifiers()), Modifier::toString);
-      List<String> parameters = mapList(new ArrayList<>(
-              spec.getParameters()), parameter -> parameter.getType() + " " + parameter.getIdentifier()
-      );
+    public String encode() {
+      Sequence modifiers = new Sequence(getModifiers(), " ");
+      Sequence parameters = new Sequence(getParameters(), ", ");
 
       builder.append("  ");
-      builder.append(new Sequence(modifiers, " ").unify());
-      appendIn(" ", spec.getReturnType(), " ");
-      appendIn(spec.getMethodName(), "(", new Sequence(parameters, ", ").unify(), ") {");
+      builder.append(modifiers.unify());
+      writeIn(" ", spec.getReturnType(), " ");
+      writeIn(spec.getMethodName(), "(", parameters.unify(), ") {");
 
       for (Map.Entry<String, MethodLine> entry : spec.getStatements().entrySet()) {
-        append(false, "%s%s", entry.getValue(), entry.getKey());
+        write(false, "%s%s", entry.getValue(), entry.getKey());
         char end = entry.getValue().end;
-        appendIn(end == '{' ? " " + end : end);
+        writeIn(end == '{' ? " " + end : end);
         if (entry.getValue() == MethodLine.STATEMENT) {
-          append(false, "%s}", MethodLine.EXPRESSION);
+          write(false, "%s}", MethodLine.EXPRESSION);
         }
       }
-      append(true, "  }");
+      write(true, "  }");
       return builder.toString();
     }
 
-    private void appendIn(Object... args) {
-      for (Object arg : args) {
-        builder.append(arg);
+    private List<String> getModifiers() {
+      return mapList(new ArrayList<>(spec.getModifiers()), Modifier::toString);
+    }
+
+    private List<String> getParameters() {
+      List<String> parameters = new ArrayList<>();
+      for (Map.Entry<String, String> entry : spec.getParameters().entrySet()) {
+        parameters.add(entry.getKey() + " " + entry.getValue());
       }
+      return parameters;
     }
   }
 }

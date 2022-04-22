@@ -40,20 +40,27 @@ public class BuilderGenerator {
 
     for (Parameter parameter : elementParameters.getParameters()) {
       String identifier = parameter.getIdentifier();
-      methods.add(MethodSpec.methodBuilder()
+      MethodSpec.Builder builder = MethodSpec.methodBuilder()
               .addModifier(Modifier.PUBLIC)
               .name(parameter.getMethodName())
-              .returns(typeInfo.getFullName())
-              .addParameter(parameter)
-              .addStatement("this.%s = %s", identifier, identifier)
-              .addStatement("return this")
-              .create()
-      );
+              .returns(typeInfo.getFullName());
+
+      switch (parameter.getStyle()) {
+        case SETTER:
+          builder.addParameter(parameter.getType(), parameter.getIdentifier());
+          builder.addStatement("this.%s = %s", identifier, identifier);
+          break;
+        case COLLECTION:
+          builder.addParameter(parameter.getTypeParameters().get(0), parameter.getIdentifier());
+          builder.addStatement("this.%s.add(%s)", identifier, identifier);
+          break;
+        default: break;
+      }
+      methods.add(builder.addStatement("return this").create());
     }
 
     methods.add(buildMethod());
-
-    return CodeWriter.classWriter(packageName, typeInfo, elementParameters, methods).write();
+    return CodeWriter.classWriter(packageName, typeInfo, elementParameters, methods).encode();
   }
 
   /**
